@@ -17,6 +17,11 @@ function countNaiveCalls(n: number): number {
 }
 
 function App() {
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const savedTheme = window.localStorage.getItem('dp-visualizer-theme')
+    if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  })
   const [inputValue, setInputValue] = useState('')
   const [result, setResult] = useState<FibonacciResult | null>(null)
   const [error, setError] = useState('')
@@ -32,6 +37,12 @@ function App() {
   const memoizedCalls = steps.filter((step) => step.type === 'call').length
   const rootN = steps.find((step) => step.type === 'call' && step.parentCallId === undefined)?.n ?? 0
   const naiveCalls = result ? countNaiveCalls(rootN) : 0
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme
+    window.localStorage.setItem('dp-visualizer-theme', theme)
+  }, [theme])
 
   useEffect(() => {
     if (!isPlaying || steps.length === 0) return
@@ -102,6 +113,27 @@ function App() {
 
   return (
     <div className="app-shell">
+      <div className="aurora" aria-hidden="true">
+        <span className="aurora-wave aurora-wave-one" />
+        <span className="aurora-wave aurora-wave-two" />
+        <span className="aurora-wave aurora-wave-three" />
+      </div>
+      <button
+        className={`theme-toggle theme-toggle-${theme}`}
+        type="button"
+        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+        aria-pressed={theme === 'light'}
+        onClick={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')}
+      >
+        <span className="theme-toggle-label">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+        <span className="theme-toggle-icon" aria-hidden="true">
+          {theme === 'dark' ? (
+            <svg viewBox="0 0 24 24"><path d="M20 15.2A8.4 8.4 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5" /><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" /></svg>
+          )}
+        </span>
+      </button>
       <header className="page-header">
         <p className="eyebrow">DP Visualizer</p>
         <h1>DP Visualizer</h1>
@@ -281,10 +313,10 @@ function App() {
             <p>Memoization is a simple idea with a big payoff: remember work you have already completed, then reuse it. Fibonacci makes that pattern easy to see, but the same thinking powers tools and decisions we encounter every day.</p>
           </div>
           <div className="impact-examples">
-            <article><span className="impact-icon" aria-hidden="true">↗</span><div><h3>Routes &amp; travel</h3><p>Navigation apps reuse solutions to smaller route problems to find an efficient trip.</p></div></article>
-            <article><span className="impact-icon" aria-hidden="true">⌨</span><div><h3>Typing &amp; search</h3><p>Spell-checking and text comparison build answers from previously solved subproblems.</p></div></article>
-            <article><span className="impact-icon" aria-hidden="true">▦</span><div><h3>Planning resources</h3><p>Scheduling and budgeting compare choices while avoiding the same calculations twice.</p></div></article>
-            <article><span className="impact-icon" aria-hidden="true">▶</span><div><h3>Media &amp; recommendations</h3><p>Modern systems cache repeated results so familiar content can load and respond faster.</p></div></article>
+            <article><span className="impact-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19c4-8 8-4 14-14M13 5h6v6" /></svg></span><div><h3>Routes &amp; travel</h3><p>Navigation apps reuse solutions to smaller route problems to find an efficient trip.</p></div></article>
+            <article><span className="impact-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" /><path d="M6 10h1M10 10h1M14 10h1M18 10h.01M7 14h10" /></svg></span><div><h3>Typing &amp; search</h3><p>Spell-checking and text comparison build answers from previously solved subproblems.</p></div></article>
+            <article><span className="impact-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><rect x="14" y="14" width="6" height="6" rx="1" /></svg></span><div><h3>Planning resources</h3><p>Scheduling and budgeting compare choices while avoiding the same calculations twice.</p></div></article>
+            <article><span className="impact-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 7 8 5-8 5Z" /></svg></span><div><h3>Media &amp; recommendations</h3><p>Modern systems cache repeated results so familiar content can load and respond faster.</p></div></article>
           </div>
           <p className="impact-takeaway"><strong>The core habit:</strong> before solving a problem again, ask whether you already know the answer.</p>
         </section>

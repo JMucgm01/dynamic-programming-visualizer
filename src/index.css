@@ -17,6 +17,7 @@
 
 html {
   background: #050505;
+  transition: background-color .25s ease;
 }
 
 body {
@@ -24,6 +25,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: radial-gradient(circle at 50% -12%, rgba(255,255,255,.07), transparent 34%), linear-gradient(180deg, #0b0b0b 0%, #050505 100%);
+  transition:background .6s cubic-bezier(.22,1,.36,1),color .4s ease;
 }
 
 img {
@@ -40,4 +42,14 @@ select {
 
 #root {
   min-height: 100vh;
+}
+
+:root[data-theme='light'] {
+  color:#302b34;
+  background:#f3f0f4;
+  color-scheme:light;
+}
+
+:root[data-theme='light'] body {
+  background:radial-gradient(circle at 50% -12%,rgba(124,83,164,.12),transparent 34%),linear-gradient(180deg,#faf9fb 0%,#efecf1 100%);
 }
